@@ -151,7 +151,13 @@ public final class DefaultTrace implements Trace, TraceRootSupport {
         if (spanEvent.isTimeRecording()) {
             spanEvent.markAfterTime();
         }
-        logSpan(spanEvent);
+        boolean send = spanEvent.getTraceRoot().getTraceId().isSend();
+        if(send){
+            logSpan(spanEvent);
+        } else {
+            logger.info("do not send!");
+        }
+
     }
 
 

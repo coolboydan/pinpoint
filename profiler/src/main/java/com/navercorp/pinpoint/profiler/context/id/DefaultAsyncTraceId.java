@@ -94,6 +94,17 @@ public class DefaultAsyncTraceId implements AsyncTraceId, TraceRootSupport {
     }
 
     @Override
+    public boolean isSend() {
+        return traceRoot.getTraceId().isSend();
+    }
+
+    @Override
+    public void setSend(boolean send) {
+        traceRoot.getTraceId().setSend(send);
+    }
+
+
+    @Override
     public long getSpanStartTime() {
         return traceRoot.getTraceStartTime();
     }

@@ -182,7 +182,11 @@ public class AsyncChildTrace implements Trace {
         if (spanEvent.isTimeRecording()) {
             spanEvent.markAfterTime();
         }
-        logSpan(spanEvent);
+        boolean send = spanEvent.getTraceRoot().getTraceId().isSend();
+        if(send){
+            logSpan(spanEvent);
+        }
+
     }
 
     private void logSpan(SpanEvent spanEvent) {

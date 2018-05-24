@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author emeroad
  * @author koo.taejin
  * @author hyungil.jeong
+ * 默认agent启动入口
  */
 public class DefaultAgent implements Agent {
 
@@ -60,6 +61,7 @@ public class DefaultAgent implements Agent {
 
     static {
         // Preload classes related to pinpoint-rpc module.
+        //启动pinpoint的服务端监听和发送端的链接
         ClassPreLoader.preload();
     }
 
@@ -76,16 +78,20 @@ public class DefaultAgent implements Agent {
 
         logger.info("AgentOption:{}", agentOption);
 
+        //绑定一个pinpointLog日志体系
         this.binder = new Slf4jLoggerBinder();
         bindPLoggerFactory(this.binder);
 
+        //获取系统中的配置信息
         dumpSystemProperties();
         dumpConfig(agentOption.getProfilerConfig());
 
         changeStatus(AgentStatus.INITIALIZING);
 
+        //获取配置信息
         this.profilerConfig = agentOption.getProfilerConfig();
 
+        //启动上下文
         this.applicationContext = newApplicationContext(agentOption);
 
         

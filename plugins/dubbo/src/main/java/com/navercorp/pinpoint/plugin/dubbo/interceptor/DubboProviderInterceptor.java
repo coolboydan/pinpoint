@@ -144,12 +144,12 @@ public class DubboProviderInterceptor implements AroundInterceptor {
             return traceContext.newTraceObject();
         }
 
-        // otherwise, continue tracing with given data.
+        // otherwise, continue tracing with given data. 根据consumer给的参数放入本地链路跟踪
         long parentSpanID = NumberUtils.parseLong(invocation.getAttachment(DubboConstants.META_PARENT_SPAN_ID), SpanId.NULL);
         long spanID = NumberUtils.parseLong(invocation.getAttachment(DubboConstants.META_SPAN_ID), SpanId.NULL);
         short flags = NumberUtils.parseShort(invocation.getAttachment(DubboConstants.META_FLAGS), (short) 0);
         TraceId traceId = traceContext.createTraceId(transactionId, parentSpanID, spanID, flags);
-
+        //生成新的链路。
         return traceContext.continueTraceObject(traceId);
     }
 

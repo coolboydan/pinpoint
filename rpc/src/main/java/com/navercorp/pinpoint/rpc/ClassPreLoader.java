@@ -39,13 +39,15 @@ public final class ClassPreLoader {
     }
 
     public static void preload(int port) {
+
         PinpointServerAcceptor serverAcceptor = null;
         PinpointClient client = null;
         PinpointClientFactory clientFactory = null;
         try {
+            //pinpoint启动服务监听者
             serverAcceptor = new PinpointServerAcceptor();
             serverAcceptor.bind("127.0.0.1", port);
-
+            //pinpoint启动客户端
             clientFactory = new DefaultPinpointClientFactory();
             client = clientFactory.connect("127.0.0.1", port);
             client.sendSync(new byte[0]);

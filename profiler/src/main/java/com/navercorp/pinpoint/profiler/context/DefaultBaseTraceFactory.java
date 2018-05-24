@@ -21,6 +21,7 @@ import com.navercorp.pinpoint.bootstrap.context.SpanRecorder;
 import com.navercorp.pinpoint.bootstrap.context.Trace;
 import com.navercorp.pinpoint.bootstrap.context.TraceId;
 import com.navercorp.pinpoint.bootstrap.sampler.Sampler;
+import com.navercorp.pinpoint.bootstrap.sampler.SendRate;
 import com.navercorp.pinpoint.common.annotations.InterfaceAudience;
 import com.navercorp.pinpoint.common.util.Assert;
 import com.navercorp.pinpoint.profiler.context.active.ActiveTraceHandle;
@@ -45,6 +46,7 @@ public class DefaultBaseTraceFactory implements BaseTraceFactory {
 
     private final StorageFactory storageFactory;
     private final Sampler sampler;
+    private final SendRate sendRate;
 
     private final IdGenerator idGenerator;
     private final AsyncContextFactory asyncContextFactory;
@@ -59,7 +61,7 @@ public class DefaultBaseTraceFactory implements BaseTraceFactory {
 
     public DefaultBaseTraceFactory(TraceRootFactory traceRootFactory, CallStackFactory callStackFactory, StorageFactory storageFactory,
                                    Sampler sampler, IdGenerator idGenerator, AsyncContextFactory asyncContextFactory,
-                                   SpanFactory spanFactory, RecorderFactory recorderFactory, ActiveTraceRepository activeTraceRepository) {
+                                   SpanFactory spanFactory, RecorderFactory recorderFactory, ActiveTraceRepository activeTraceRepository, SendRate sendRate) {
 
         this.traceRootFactory = Assert.requireNonNull(traceRootFactory, "traceRootFactory must not be null");
         this.callStackFactory = Assert.requireNonNull(callStackFactory, "callStackFactory must not be null");
@@ -71,6 +73,7 @@ public class DefaultBaseTraceFactory implements BaseTraceFactory {
         this.spanFactory = Assert.requireNonNull(spanFactory, "spanFactory must not be null");
         this.recorderFactory = Assert.requireNonNull(recorderFactory, "recorderFactory must not be null");
         this.activeTraceRepository = Assert.requireNonNull(activeTraceRepository, "activeTraceRepository must not be null");
+        this.sendRate = Assert.requireNonNull(sendRate, "sendRate must not be null");;
     }
 
 
@@ -110,8 +113,13 @@ public class DefaultBaseTraceFactory implements BaseTraceFactory {
     public Trace newTraceObject() {
         // TODO need to modify how to inject a datasender
         final boolean sampling = sampler.isSampling();
+        boolean needSend = sendRate.isNeedSend();
         if (sampling) {
             final TraceRoot traceRoot = traceRootFactory.newTraceRoot();
+
+            if(traceRoot.getTraceId().isRoot()){
+                traceRoot.getTraceId().setSend(needSend);
+            }
             final Span span = spanFactory.newSpan(traceRoot);
 
             final Storage storage = storageFactory.createStorage(traceRoot);
@@ -190,9 +198,13 @@ public class DefaultBaseTraceFactory implements BaseTraceFactory {
     public Trace newAsyncTraceObject() {
 
         final boolean sampling = sampler.isSampling();
+        boolean needSend = sendRate.isNeedSend();
         if (sampling) {
 
             final TraceRoot traceRoot = traceRootFactory.newTraceRoot();
+            if(traceRoot.getTraceId().isRoot()){
+                traceRoot.getTraceId().setSend(needSend);
+            }
             final Span span = spanFactory.newSpan(traceRoot);
 
             final Storage storage = storageFactory.createStorage(traceRoot);

@@ -79,6 +79,7 @@ class PinpointStarter {
     }
 
     boolean start() {
+        //id检查器？
         final IdValidator idValidator = new IdValidator();
         final String agentId = idValidator.getAgentId();
         if (agentId == null) {
@@ -89,6 +90,7 @@ class PinpointStarter {
             return false;
         }
 
+        //准备加载plugin包路径，配置路径。
         List<String> pluginJars = classPathResolver.resolvePlugins();
         String configPath = getConfigPath(classPathResolver);
         if (configPath == null) {
@@ -98,21 +100,27 @@ class PinpointStarter {
         // set the path of log file as a system property
         saveLogFilePath(classPathResolver);
 
+
         savePinpointVersion();
 
         try {
             // Is it right to load the configuration in the bootstrap?
+            //获取配置信息
             ProfilerConfig profilerConfig = DefaultProfilerConfig.load(configPath);
 
             // this is the library list that must be loaded
             List<URL> libUrlList = resolveLib(classPathResolver);
             URL[] urls = libUrlList.toArray(new URL[libUrlList.size()]);
+            //获得boot启动接口
             final String bootClass = getBootClass();
             AgentBootLoader agentBootLoader = new AgentBootLoader(bootClass, urls, parentClassLoader);
             logger.info("pinpoint agent [" + bootClass + "] starting...");
 
+            //包装一层agent操作
             AgentOption option = createAgentOption(agentId, applicationName, profilerConfig, instrumentation, pluginJars, bootstrapJarFile);
+            //使用线程启动，研究下为什么要用线程。
             Agent pinpointAgent = agentBootLoader.boot(option);
+            //执行agent真正启动
             pinpointAgent.start();
             registerShutdownHook(pinpointAgent);
             logger.info("pinpoint agent started normally.");

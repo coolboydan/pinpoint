@@ -178,6 +178,9 @@ public class DefaultProfilerConfig implements ProfilerConfig {
     private String injectionModuleFactoryClazzName = null;
     private String applicationNamespace = "";
 
+    //sendRate 新增参数
+    private int sendRate = 1;
+
     public DefaultProfilerConfig() {
         this.properties = new Properties();
     }
@@ -609,6 +612,8 @@ public class DefaultProfilerConfig implements ProfilerConfig {
 
         this.applicationNamespace = readString("profiler.application.namespace", "");
 
+        this.sendRate = readInt("profiler.send.rate", 1);
+
         logger.info("configuration loaded successfully.");
     }
 
@@ -710,6 +715,11 @@ public class DefaultProfilerConfig implements ProfilerConfig {
     }
 
     @Override
+    public int getSendRate() {
+        return sendRate;
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("DefaultProfilerConfig{");
         sb.append("properties=").append(properties);
@@ -753,6 +763,7 @@ public class DefaultProfilerConfig implements ProfilerConfig {
         sb.append(", maxSqlBindValueSize=").append(maxSqlBindValueSize);
         sb.append(", samplingEnable=").append(samplingEnable);
         sb.append(", samplingRate=").append(samplingRate);
+        sb.append(", sendRate=").append(sendRate);
         sb.append(", ioBufferingEnable=").append(ioBufferingEnable);
         sb.append(", ioBufferingBufferSize=").append(ioBufferingBufferSize);
         sb.append(", profileOsName='").append(profileOsName).append('\'');

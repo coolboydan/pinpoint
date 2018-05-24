@@ -160,4 +160,8 @@ public interface ProfilerConfig {
 
     Map<String, String> readPattern(String propertyNamePatternRegex);
 
+
+    //新增参数，发送率
+    int getSendRate();
+
 }

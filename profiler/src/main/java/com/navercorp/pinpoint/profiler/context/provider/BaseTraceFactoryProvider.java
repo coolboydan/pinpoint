@@ -19,6 +19,7 @@ package com.navercorp.pinpoint.profiler.context.provider;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.navercorp.pinpoint.bootstrap.sampler.Sampler;
+import com.navercorp.pinpoint.bootstrap.sampler.SendRate;
 import com.navercorp.pinpoint.common.util.Assert;
 import com.navercorp.pinpoint.profiler.context.AsyncContextFactory;
 import com.navercorp.pinpoint.profiler.context.BaseTraceFactory;
@@ -42,6 +43,7 @@ public class BaseTraceFactoryProvider implements Provider<BaseTraceFactory> {
     private final TraceRootFactory traceRootFactory;
     private final StorageFactory storageFactory;
     private final Sampler sampler;
+    private final SendRate sendRate;
     private final IdGenerator idGenerator;
 
     private final Provider<AsyncContextFactory> asyncContextFactoryProvider;
@@ -56,7 +58,7 @@ public class BaseTraceFactoryProvider implements Provider<BaseTraceFactory> {
     @Inject
     public BaseTraceFactoryProvider(TraceRootFactory traceRootFactory, StorageFactory storageFactory, Sampler sampler,
                                     IdGenerator idGenerator, Provider<AsyncContextFactory> asyncContextFactoryProvider,
-                                    CallStackFactory callStackFactory, SpanFactory spanFactory, RecorderFactory recorderFactory, ActiveTraceRepository activeTraceRepository) {
+                                    CallStackFactory callStackFactory, SpanFactory spanFactory, RecorderFactory recorderFactory, ActiveTraceRepository activeTraceRepository, SendRate sendRate) {
         this.traceRootFactory = Assert.requireNonNull(traceRootFactory, "traceRootFactory must not be null");
 
         this.callStackFactory = Assert.requireNonNull(callStackFactory, "callStackFactory must not be null");
@@ -70,13 +72,14 @@ public class BaseTraceFactoryProvider implements Provider<BaseTraceFactory> {
         this.recorderFactory = Assert.requireNonNull(recorderFactory, "recorderFactory must not be null");
         this.activeTraceRepository = Assert.requireNonNull(activeTraceRepository, "activeTraceRepository must not be null");
 
+        this.sendRate = Assert.requireNonNull(sendRate, "sendRate must not be null");;
     }
 
     @Override
     public BaseTraceFactory get() {
         final AsyncContextFactory asyncContextFactory = asyncContextFactoryProvider.get();
         BaseTraceFactory baseTraceFactory = new DefaultBaseTraceFactory(traceRootFactory, callStackFactory, storageFactory, sampler, idGenerator,
-                asyncContextFactory, spanFactory, recorderFactory, activeTraceRepository);
+                asyncContextFactory, spanFactory, recorderFactory, activeTraceRepository, sendRate);
         if (isDebugEnabled()) {
             baseTraceFactory = LoggingBaseTraceFactory.wrap(baseTraceFactory);
         }

@@ -88,6 +88,7 @@
         <sniffer.artifactid>java16</sniffer.artifactid>
         <dubbo.version>2.5.3</dubbo.version>
         <asm.version>6.1</asm.version>
+        <kafka.version>1.0.0-SNAPSHOT</kafka.version>
     </properties>
 
     <dependencies>

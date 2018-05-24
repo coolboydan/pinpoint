@@ -38,4 +38,7 @@ public interface TraceId {
     short getFlags();
 
     boolean isRoot();
+
+    boolean isSend();
+    void setSend(boolean send);
 }

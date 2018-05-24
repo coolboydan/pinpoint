@@ -32,6 +32,7 @@ public class DefaultTraceId implements TraceId {
     private final long parentSpanId;
     private final long spanId;
     private final short flags;
+    private boolean isSend = true;
 
     public DefaultTraceId(String agentId, long agentStartTime, long transactionId) {
         this(agentId, agentStartTime, transactionId, SpanId.NULL, SpanId.newSpanId(), (short) 0);
@@ -86,6 +87,15 @@ public class DefaultTraceId implements TraceId {
 
     public boolean isRoot() {
         return this.parentSpanId == SpanId.NULL;
+    }
+
+    @Override
+    public boolean isSend() {
+        return isSend;
+    }
+
+    public void setSend(boolean send) {
+        isSend = send;
     }
 
     @Override

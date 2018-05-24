@@ -25,6 +25,7 @@ import com.navercorp.pinpoint.bootstrap.context.TraceContext;
 import com.navercorp.pinpoint.bootstrap.instrument.DynamicTransformTrigger;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.JdbcContext;
 import com.navercorp.pinpoint.bootstrap.sampler.Sampler;
+import com.navercorp.pinpoint.bootstrap.sampler.SendRate;
 import com.navercorp.pinpoint.common.plugin.PluginLoader;
 import com.navercorp.pinpoint.common.trace.ServiceType;
 import com.navercorp.pinpoint.profiler.AgentInfoSender;
@@ -62,34 +63,7 @@ import com.navercorp.pinpoint.profiler.context.method.PredefinedMethodDescriptor
 import com.navercorp.pinpoint.profiler.context.monitor.DataSourceMonitorRegistryService;
 import com.navercorp.pinpoint.profiler.context.monitor.DefaultJdbcContext;
 import com.navercorp.pinpoint.profiler.context.monitor.JdbcUrlParsingService;
-import com.navercorp.pinpoint.profiler.context.provider.ActiveTraceRepositoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.AgentInfoFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.AgentInfoSenderProvider;
-import com.navercorp.pinpoint.profiler.context.provider.AgentInformationProvider;
-import com.navercorp.pinpoint.profiler.context.provider.ApiMetaDataServiceProvider;
-import com.navercorp.pinpoint.profiler.context.provider.ApplicationServerTypeProvider;
-import com.navercorp.pinpoint.profiler.context.provider.AsyncContextFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.AsyncTraceContextProvider;
-import com.navercorp.pinpoint.profiler.context.provider.BaseTraceFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.CallStackFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.ClassFileTransformerProvider;
-import com.navercorp.pinpoint.profiler.context.provider.DataSourceMonitorRegistryServiceProvider;
-import com.navercorp.pinpoint.profiler.context.provider.DeadlockMonitorProvider;
-import com.navercorp.pinpoint.profiler.context.provider.DeadlockThreadRegistryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.DynamicTransformTriggerProvider;
-import com.navercorp.pinpoint.profiler.context.provider.InstrumentEngineProvider;
-import com.navercorp.pinpoint.profiler.context.provider.JdbcUrlParsingServiceProvider;
-import com.navercorp.pinpoint.profiler.context.provider.JvmInformationProvider;
-import com.navercorp.pinpoint.profiler.context.provider.ObjectBinderFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.PluginContextLoadResultProvider;
-import com.navercorp.pinpoint.profiler.context.provider.SamplerProvider;
-import com.navercorp.pinpoint.profiler.context.provider.ServerMetaDataHolderProvider;
-import com.navercorp.pinpoint.profiler.context.provider.ServerMetaDataRegistryServiceProvider;
-import com.navercorp.pinpoint.profiler.context.provider.SpanChunkFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.SpanPostProcessorProvider;
-import com.navercorp.pinpoint.profiler.context.provider.StorageFactoryProvider;
-import com.navercorp.pinpoint.profiler.context.provider.TraceContextProvider;
-import com.navercorp.pinpoint.profiler.context.provider.TraceFactoryProvider;
+import com.navercorp.pinpoint.profiler.context.provider.*;
 import com.navercorp.pinpoint.profiler.context.provider.plugin.PluginLoaderProvider;
 import com.navercorp.pinpoint.profiler.context.recorder.DefaultRecorderFactory;
 import com.navercorp.pinpoint.profiler.context.recorder.RecorderFactory;
@@ -143,6 +117,7 @@ public class ApplicationContextModule extends AbstractModule {
         bind(TransactionIdEncoder.class).to(DefaultTransactionIdEncoder.class).in(Scopes.SINGLETON);
 
         bind(Sampler.class).toProvider(SamplerProvider.class).in(Scopes.SINGLETON);
+        bind(SendRate.class).toProvider(SendRateProvider.class).in(Scopes.SINGLETON);
 
 
         final TypeLiteral<Binder<Trace>> binder = new TypeLiteral<Binder<Trace>>() {};
