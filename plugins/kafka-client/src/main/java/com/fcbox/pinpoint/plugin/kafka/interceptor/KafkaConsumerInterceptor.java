@@ -104,6 +104,13 @@ public class KafkaConsumerInterceptor implements AroundInterceptor {
         long spanID = NumberUtils.parseLong(kafkaEvent.getHeaders().get(KafkaConfiguration.META_SPAN_ID), SpanId.NULL);
         short flags = NumberUtils.parseShort(kafkaEvent.getHeaders().get(KafkaConfiguration.META_FLAGS), (short) 0);
         TraceId traceId = traceContext.createTraceId(transactionId, parentSpanID, spanID, flags);
+        if(kafkaEvent.getHeaders().get(KafkaConfiguration.META_NEED_SEND)!=null){
+            traceId.setSend(false);
+        }
+
+        if (isDebug) {
+            logger.debug(" after kafkaEvent traceId{}", traceId);
+        }
         //生成新的链路。
         return traceContext.continueTraceObject(traceId);
     }
@@ -142,6 +149,9 @@ public class KafkaConsumerInterceptor implements AroundInterceptor {
 
         final Trace trace = traceContext.currentRawTraceObject();
 
+        if (isDebug) {
+            logger.debug("after interceptory {}",trace);
+        }
         if (trace == null) {
             return;
         }

@@ -20,6 +20,7 @@ public interface KafkaConfiguration {
     AnnotationKey KAFKA_ARGS_ANNOTATION_KEY = AnnotationKeyFactory.of(350, "kafka.args");
 
     String META_DO_NOT_TRACE = "_KAFKA_DO_NOT_TRACE";
+    String META_NEED_SEND = "_KAFKA_NEED_SEND";
     String META_TRANSACTION_ID = "_KAFKA_TRASACTION_ID";
     String META_SPAN_ID = "_KAFKA_SPAN_ID";
     String META_PARENT_SPAN_ID = "_KAFKA_PARENT_SPAN_ID";

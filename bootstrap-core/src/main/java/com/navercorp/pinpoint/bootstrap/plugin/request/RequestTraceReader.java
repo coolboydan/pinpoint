@@ -122,6 +122,9 @@ public class RequestTraceReader {
             final long spanId = NumberUtils.parseLong(serverRequestTrace.getHeader(Header.HTTP_SPAN_ID.toString()), SpanId.NULL);
             final short flags = NumberUtils.parseShort(serverRequestTrace.getHeader(Header.HTTP_FLAGS.toString()), (short) 0);
             final TraceId id = this.traceContext.createTraceId(transactionId, parentSpanId, spanId, flags);
+            if(serverRequestTrace.getHeader(Header.HTTP_SEND.toString())!=null){
+                id.setSend(false);
+            }
             return id;
         }
         return null;

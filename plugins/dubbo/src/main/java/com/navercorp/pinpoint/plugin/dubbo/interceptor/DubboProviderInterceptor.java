@@ -149,6 +149,10 @@ public class DubboProviderInterceptor implements AroundInterceptor {
         long spanID = NumberUtils.parseLong(invocation.getAttachment(DubboConstants.META_SPAN_ID), SpanId.NULL);
         short flags = NumberUtils.parseShort(invocation.getAttachment(DubboConstants.META_FLAGS), (short) 0);
         TraceId traceId = traceContext.createTraceId(transactionId, parentSpanID, spanID, flags);
+
+        if(invocation.getAttachment(DubboConstants.META_DO_NOT_SEND)!=null){
+            traceId.setSend(false);
+        }
         //生成新的链路。
         return traceContext.continueTraceObject(traceId);
     }

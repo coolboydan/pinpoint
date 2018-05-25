@@ -1,13 +1,11 @@
 package com.fcbox.pinpoint.plugin.kafka.interceptor;
 
-import com.fcbox.kafka.bean.KafkaEvent;
+
 import com.fcbox.pinpoint.plugin.kafka.KafkaConfiguration;
 import com.navercorp.pinpoint.bootstrap.context.*;
 import com.navercorp.pinpoint.bootstrap.interceptor.AroundInterceptor;
 import com.navercorp.pinpoint.bootstrap.logging.PLogger;
 import com.navercorp.pinpoint.bootstrap.logging.PLoggerFactory;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 
@@ -34,16 +32,16 @@ public class KafkaProducerInterceptor implements AroundInterceptor {
             logger.beforeInterceptor(target, args);
 
         }
-        logger.info("kafka kafkaProducer{}", args);
+
         Trace trace = traceContext.currentRawTraceObject();
         if (trace == null) {
             return;
         }
 
         //获取kafka ProducerRecord
-        KafkaEvent kafkaEvent = (KafkaEvent) args[0];
+        ProducerRecord producerRecord = (ProducerRecord) args[0];
         if(isDebug){
-            logger.debug("kafka kafkaProducer{}", kafkaEvent);
+            logger.debug("kafka kafkaProducer{}", producerRecord);
         }
         if (trace.canSampled()) {
             SpanEventRecorder recorder = trace.traceBlockBegin();
@@ -54,26 +52,44 @@ public class KafkaProducerInterceptor implements AroundInterceptor {
             recorder.recordNextSpanId(nextId.getSpanId());
 
             //在头上添加头文件。
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_TRANSACTION_ID,nextId.getTransactionId());
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_SPAN_ID,Long.toString(nextId.getSpanId() ));
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_PARENT_SPAN_ID,Long.toString(nextId.getSpanId()) );
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_PARENT_APPLICATION_TYPE,Short.toString(traceContext.getServerTypeCode()) );
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_PARENT_APPLICATION_NAME,traceContext.getApplicationName() );
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_FLAGS,Short.toString(nextId.getFlags()) );
+            producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_TRANSACTION_ID,nextId.getTransactionId().getBytes()));
+             producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_SPAN_ID,Long.toString(nextId.getSpanId()).getBytes()));
+             producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_PARENT_SPAN_ID,Long.toString(nextId.getSpanId()).getBytes()));
+             producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_PARENT_APPLICATION_TYPE,Short.toString(traceContext.getServerTypeCode()).getBytes()));
+             producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_PARENT_APPLICATION_NAME,traceContext.getApplicationName().getBytes()));
+             producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_FLAGS,Short.toString(nextId.getFlags()).getBytes()));
+
+            if(doNotSend(trace)){
+                 producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_NEED_SEND,"do not send".getBytes()));
+            }
+
+            if(isDebug){
+                logger.debug("after kafka kafkaProducer{}", producerRecord);
+            }
         } else {
-            kafkaEvent.getHeaders().put(KafkaConfiguration.META_DO_NOT_TRACE,"1" );
+             producerRecord.headers().add(new RecordHeader(KafkaConfiguration.META_DO_NOT_TRACE,"1".getBytes()));
         }
+    }
+
+    private boolean doNotSend(Trace trace) {
+        return !trace.getTraceId().isSend();
     }
 
     @Override
     public void after(Object target, Object[] args, Object result, Throwable throwable) {
+
+        if(isDebug){
+            logger.debug("after kafka KafkaProducerInterceptor");
+        }
         Trace trace = traceContext.currentTraceObject();
         if (trace == null) {
             return;
         }
 
-        KafkaEvent kafkaEvent = (KafkaEvent)args[0];
-
+        ProducerRecord kafkaEvent = (ProducerRecord)args[0];
+        if(isDebug){
+            logger.debug("after kafka KafkaProducerInterceptor {},{}",kafkaEvent,trace);
+        }
 
 
         try {
@@ -85,10 +101,10 @@ public class KafkaProducerInterceptor implements AroundInterceptor {
 
 
                 // (server address)统计地址topic partition等信息。
-                recorder.recordEndPoint(kafkaEvent.getTopic());
+                recorder.recordEndPoint(kafkaEvent.topic());
 
                 // Optionally, record the destination id (logical name of server. e.g. DB name)
-                recorder.recordDestinationId(kafkaEvent.getTopic());
+                recorder.recordDestinationId(kafkaEvent.topic());
 
                 recorder.recordAttribute(KafkaConfiguration.KAFKA_ARGS_ANNOTATION_KEY,kafkaEvent);
             } else {

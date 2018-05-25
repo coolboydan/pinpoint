@@ -21,6 +21,7 @@ public interface DubboConstants {
     AnnotationKey DUBBO_RPC_ANNOTATION_KEY = AnnotationKeyFactory.of(92, "dubbo.rpc", VIEW_IN_RECORD_SET);
 
     String META_DO_NOT_TRACE = "_DUBBO_DO_NOT_TRACE";
+    String META_DO_NOT_SEND = "_DUBBO_DO_NOT_SEND";
     String META_TRANSACTION_ID = "_DUBBO_TRASACTION_ID";
     String META_SPAN_ID = "_DUBBO_SPAN_ID";
     String META_PARENT_SPAN_ID = "_DUBBO_PARENT_SPAN_ID";

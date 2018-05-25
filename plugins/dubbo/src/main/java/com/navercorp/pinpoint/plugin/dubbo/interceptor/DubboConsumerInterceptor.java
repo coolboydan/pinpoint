@@ -55,6 +55,10 @@ public class DubboConsumerInterceptor implements AroundInterceptor1 {
             invocation.setAttachment(DubboConstants.META_PARENT_APPLICATION_TYPE, Short.toString(traceContext.getServerTypeCode()));
             invocation.setAttachment(DubboConstants.META_PARENT_APPLICATION_NAME, traceContext.getApplicationName());
             invocation.setAttachment(DubboConstants.META_FLAGS, Short.toString(nextId.getFlags()));
+            if(!trace.getTraceId().isSend()){
+                invocation.setAttachment(DubboConstants.META_DO_NOT_SEND, "DO NOT SEND");
+            }
+
         } else {
             // If sampling this transaction is disabled, pass only that infomation to the server.
             invocation.setAttachment(DubboConstants.META_DO_NOT_TRACE, "1");
