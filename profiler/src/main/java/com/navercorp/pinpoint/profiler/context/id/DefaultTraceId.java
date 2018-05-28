@@ -107,6 +107,7 @@ public class DefaultTraceId implements TraceId {
         sb.append(", parentSpanId=").append(parentSpanId);
         sb.append(", spanId=").append(spanId);
         sb.append(", flags=").append(flags);
+        sb.append(", isSend=").append(isSend);
         sb.append('}');
         return sb.toString();
     }

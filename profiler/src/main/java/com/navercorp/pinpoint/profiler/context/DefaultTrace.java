@@ -102,6 +102,7 @@ public final class DefaultTrace implements Trace, TraceRootSupport {
         }
         // Set properties for the case when stackFrame is not used as part of Span.
         final SpanEvent spanEvent = newSpanEvent(stackId);
+        logger.info("trace push begin{}",spanEvent);
         this.callStack.push(spanEvent);
         return wrappedSpanEventRecorder(this.wrappedSpanEventRecorder, spanEvent);
     }
@@ -126,6 +127,7 @@ public final class DefaultTrace implements Trace, TraceRootSupport {
 
     @Override
     public void traceBlockEnd(int stackId) {
+        logger.info(" traceBlockEnd begin{}",stackId);
         if (closed) {
             if (isWarn) {
                 stackDump("already closed trace");
@@ -152,7 +154,7 @@ public final class DefaultTrace implements Trace, TraceRootSupport {
             spanEvent.markAfterTime();
         }
 
-        logger.info("spanEvent {}",spanEvent);
+        logger.info("spanEvent traceBlockEnd{}",spanEvent);
         boolean send = spanEvent.getTraceRoot().getTraceId().isSend();
         if(send){
             logSpan(spanEvent);
