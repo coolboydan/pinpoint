@@ -102,7 +102,7 @@ public final class DefaultTrace implements Trace, TraceRootSupport {
         }
         // Set properties for the case when stackFrame is not used as part of Span.
         final SpanEvent spanEvent = newSpanEvent(stackId);
-        logger.info("trace push begin{}",spanEvent);
+        logger.info("trace push begin :{}",spanEvent.getTraceRoot().toString());
         this.callStack.push(spanEvent);
         return wrappedSpanEventRecorder(this.wrappedSpanEventRecorder, spanEvent);
     }
